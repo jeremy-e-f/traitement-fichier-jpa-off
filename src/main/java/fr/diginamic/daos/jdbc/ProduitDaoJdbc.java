@@ -54,10 +54,11 @@ public class ProduitDaoJdbc implements ProduitDao {
 	 */
 	private void initPreRequete(){
 		try {
+			String generatedColumns[] = { "ID" };
 			
-			preReqInsert = connection.prepareStatement("INSERT IGNORE INTO PRODUIT(ID, NOM, SCORE_NUTRITIONNEL, ENERGIE, GRAISSE, GRAISSE_SATUREE, HYDRATES_CARBONES, SUCRES, FIBRES,"+
+			preReqInsert = connection.prepareStatement("INSERT IGNORE INTO PRODUIT(NOM, SCORE_NUTRITIONNEL, ENERGIE, GRAISSE, GRAISSE_SATUREE, HYDRATES_CARBONES, SUCRES, FIBRES,"+
 			"PROTEINES, SEL, VIT_A, VIT_D, VIT_E, VIT_K, VIT_C, VIT_B1, VIT_B2, VIT_PP, VIT_B6, VIT_B9, VIT_B12, CALCIUM, MAGNESIUM, FER, BETA_CAROTENE, PRESENCE_HUILE_PALME,"+
-			"POURCENTAGE_FRUITS_LEGUMES, ID_CAT, ID_MQ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+			"POURCENTAGE_FRUITS_LEGUMES, ID_CAT, ID_MQ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);", generatedColumns);
 			
 			preReqInsertProdIng = connection.prepareStatement("INSERT IGNORE INTO PROD_ING(ID_PROD, ID_ING) VALUES(?,?);");
 			
@@ -93,94 +94,103 @@ public class ProduitDaoJdbc implements ProduitDao {
     }
 	
 	@Override
-	public Produit getById(int idProduit) {
+	public Produit getByNameMarque(String nomProduit, String nomMarque) {
+		
+		/** On vérifie les paramètres */
+		if(nomProduit== null || nomMarque== null){
+			LOG.error("Nom du produit ou de la marque manquante.");
+			return null;
+		}
+		nomProduit= nomProduit.trim().replace("'", "''");
+		nomMarque= nomMarque.trim().replace("'", "''");
+		
 		Produit produit= null;
 		Statement monStatement= null;
-		ResultSet curseur= null;
+		ResultSet rs= null;
 		
 		try {
 			monStatement = connection.createStatement();
-			curseur= monStatement.executeQuery("SELECT * FROM PRODUIT p WHERE p.ID= '"+idProduit+"';");
-			if(curseur.next()){
+			rs= monStatement.executeQuery("SELECT * FROM PRODUIT p JOIN Marque mq ON(p.ID_MQ = mq.ID) WHERE p.NOM= '"+nomProduit+"' AND mq.NOM= '"+nomMarque+"';");
+			if(rs.next()){
 				/** On récupère les données du produit */
-				int id = curseur.getInt("p.ID");
-				String nom = curseur.getString("p.NOM");
-				char scoreNutritionnel = curseur.getString("p.SCORE_NUTRITIONNEL").charAt(0);
-				Double energie = curseur.getDouble("p.ENERGIE");
-				Double graisse = curseur.getDouble("p.GRAISSE");
-				Double graisseSaturee = curseur.getDouble("p.GRAISSE_SATUREE");
-				Double hydratesCarbones = curseur.getDouble("p.HYDRATES_CARBONES");
-				Double sucres = curseur.getDouble("p.SUCRES");
-				Double fibres = curseur.getDouble("p.FIBRES");
-				Double proteines = curseur.getDouble("p.PROTEINES");
-				Double sel = curseur.getDouble("p.SEL");
-				Double vitA = curseur.getDouble("p.VIT_A");
-				Double vitD = curseur.getDouble("p.VIT_D");
-				Double vitE = curseur.getDouble("p.VIT_E");
-				Double vitK = curseur.getDouble("p.VIT_K");
-				Double vitC = curseur.getDouble("p.VIT_C");
-				Double vitB1 = curseur.getDouble("p.VIT_B1");
-				Double vitB2 = curseur.getDouble("p.VIT_B2");
-				Double vitPP = curseur.getDouble("p.VIT_PP");
-				Double vitB6 = curseur.getDouble("p.VIT_B6");
-				Double vitB9 = curseur.getDouble("p.VIT_B9");
-				Double vitB12 = curseur.getDouble("p.VIT_B12");
-				Double calcium = curseur.getDouble("p.CALCIUM");
-				Double magnesium = curseur.getDouble("p.MAGNESIUM");
-				Double fer = curseur.getDouble("p.FER");
-				Double betaCarotene = curseur.getDouble("p.BETA_CAROTENE");
-				boolean presenceHuilePalme = curseur.getBoolean("p.PRESENCE_HUILE_PALME");
-				Double pourcentageFruitsLegumes = curseur.getDouble("p.POURCENTAGE_FRUITS_LEGUMES");
+				int idProduit = rs.getInt("p.ID");
+				String nom = rs.getString("p.NOM");
+				char scoreNutritionnel = rs.getString("p.SCORE_NUTRITIONNEL").charAt(0);
+				Double energie = rs.getDouble("p.ENERGIE");
+				Double graisse = rs.getDouble("p.GRAISSE");
+				Double graisseSaturee = rs.getDouble("p.GRAISSE_SATUREE");
+				Double hydratesCarbones = rs.getDouble("p.HYDRATES_CARBONES");
+				Double sucres = rs.getDouble("p.SUCRES");
+				Double fibres = rs.getDouble("p.FIBRES");
+				Double proteines = rs.getDouble("p.PROTEINES");
+				Double sel = rs.getDouble("p.SEL");
+				Double vitA = rs.getDouble("p.VIT_A");
+				Double vitD = rs.getDouble("p.VIT_D");
+				Double vitE = rs.getDouble("p.VIT_E");
+				Double vitK = rs.getDouble("p.VIT_K");
+				Double vitC = rs.getDouble("p.VIT_C");
+				Double vitB1 = rs.getDouble("p.VIT_B1");
+				Double vitB2 = rs.getDouble("p.VIT_B2");
+				Double vitPP = rs.getDouble("p.VIT_PP");
+				Double vitB6 = rs.getDouble("p.VIT_B6");
+				Double vitB9 = rs.getDouble("p.VIT_B9");
+				Double vitB12 = rs.getDouble("p.VIT_B12");
+				Double calcium = rs.getDouble("p.CALCIUM");
+				Double magnesium = rs.getDouble("p.MAGNESIUM");
+				Double fer = rs.getDouble("p.FER");
+				Double betaCarotene = rs.getDouble("p.BETA_CAROTENE");
+				boolean presenceHuilePalme = rs.getBoolean("p.PRESENCE_HUILE_PALME");
+				Double pourcentageFruitsLegumes = rs.getDouble("p.POURCENTAGE_FRUITS_LEGUMES");
 				
 				/** On extrait la Categorie correspondante */
 				CategorieDao catDao= new CategorieDaoJdbc(connection);
-				Categorie categorie= catDao.getById(curseur.getInt("p.ID_CAT"));
+				Categorie categorie= catDao.getById(rs.getInt("p.ID_CAT"));
 				catDao= null;
 				
 				/** On récupère la Marque */
 				MarqueDao mqDao= new MarqueDaoJdbc(connection);
-				Marque marque= mqDao.getById(curseur.getInt("p.ID_MQ"));
+				Marque marque= mqDao.getById(rs.getInt("p.ID_MQ"));
 				mqDao= null;
 				
-				curseur.close();
+				rs.close();
 				
 				/** On récupère la liste des ingrédients */
 				ArrayList<Ingredient> listeIngredients= new ArrayList<Ingredient>();
-				curseur= monStatement.executeQuery("SELECT ID_ING FROM PROD_ING WHERE ID_PROD= '"+idProduit+"';");
-				if(curseur.next()){
+				rs= monStatement.executeQuery("SELECT ID_ING FROM PROD_ING WHERE ID_PROD= '"+idProduit+"';");
+				if(rs.next()){
 					IngredientDao ingDao= new IngredientDaoJdbc(connection);
 					do{
-						Ingredient ingredient= ingDao.getById(curseur.getInt("ID_ING"));
+						Ingredient ingredient= ingDao.getById(rs.getInt("ID_ING"));
 						listeIngredients.add(ingredient);
-					}while(curseur.next());
+					}while(rs.next());
 				}
-				curseur.close();
+				rs.close();
 				
 				/** On récupère la liste des allergènes */
 				ArrayList<Allergene> listeAllergenes= new ArrayList<Allergene>();
-				curseur= monStatement.executeQuery("SELECT ID_ALL FROM PROD_ALL WHERE ID_PROD= '"+idProduit+"';");
-				if(curseur.next()){
+				rs= monStatement.executeQuery("SELECT ID_ALL FROM PROD_ALL WHERE ID_PROD= '"+idProduit+"';");
+				if(rs.next()){
 					AllergeneDao allDao= new AllergeneDaoJdbc(connection);
 					do{
-						Allergene allergene= allDao.getById(curseur.getInt("ID_ALL"));
+						Allergene allergene= allDao.getById(rs.getInt("ID_ALL"));
 						listeAllergenes.add(allergene);
-					}while(curseur.next());
+					}while(rs.next());
 				}
-				curseur.close();
+				rs.close();
 				
 				/** On récupère la liste des additifs */
 				ArrayList<Additif> listeAdditifs= new ArrayList<Additif>();
-				curseur= monStatement.executeQuery("SELECT ID_ADD FROM PROD_ADD WHERE ID_PROD= '"+idProduit+"';");
-				if(curseur.next()){
+				rs= monStatement.executeQuery("SELECT ID_ADD FROM PROD_ADD WHERE ID_PROD= '"+idProduit+"';");
+				if(rs.next()){
 					AdditifDao addDao= new AdditifDaoJdbc(connection);
 					do{
-						Additif additif= addDao.getById(curseur.getInt("ID_ADD"));
+						Additif additif= addDao.getById(rs.getInt("ID_ADD"));
 						listeAdditifs.add(additif);
-					}while(curseur.next());
+					}while(rs.next());
 				}
-				curseur.close();
+				rs.close();
 				
-				produit= new Produit(id, nom, categorie, marque, scoreNutritionnel, listeIngredients, listeAllergenes, 
+				produit= new Produit(idProduit, nom, categorie, marque, scoreNutritionnel, listeIngredients, listeAllergenes, 
 						listeAdditifs, energie, graisse, graisseSaturee, hydratesCarbones, sucres, fibres, proteines, sel, vitA ,vitD ,vitE ,vitK ,vitC ,
 						vitB1 ,vitB2 ,vitPP ,vitB6 ,vitB9 ,vitB12 ,calcium ,magnesium, fer ,betaCarotene, presenceHuilePalme, pourcentageFruitsLegumes);
 			}
@@ -202,95 +212,111 @@ public class ProduitDaoJdbc implements ProduitDao {
 			throw new SQLException("Valeur nulle!");
 		}
 		
-		/** Insertion de la catégorie correspondante */
-		if(produit.getCategorie()!= null){
-			CategorieDao catDao= new CategorieDaoJdbc(this.connection);
-			catDao.insert(produit.getCategorie());
-			catDao= null;
-		}
+		Produit objExistant= this.getByNameMarque(produit.getNom(), produit.getMarque().getNom());
 		
-		/** Insertion de la marque correspondante */
-		if(produit.getMarque()!= null){
-			MarqueDao mqDao= new MarqueDaoJdbc(this.connection);
-			mqDao.insert(produit.getMarque());
-			mqDao= null;
-		}
+		/** Si le produit n'existe pas, on le cree */
+		if(objExistant== null){
 		
-		/** Insertion du produit */
-		int i= 1;
-		preReqInsert.setInt(i++,produit.getId());
-		preReqInsert.setString(i++,produit.getNom());
-		preReqInsert.setString(i++,String.valueOf(produit.getScoreNutritionnel()));
-		preReqInsert.setObject(i++,produit.getEnergie());
-		preReqInsert.setObject(i++,produit.getGraisse());
-		preReqInsert.setObject(i++,produit.getGraisseSaturee());
-		preReqInsert.setObject(i++,produit.getHydratesCarbones());
-		preReqInsert.setObject(i++,produit.getSucres());
-		preReqInsert.setObject(i++,produit.getFibres());
-		preReqInsert.setObject(i++,produit.getProteines());
-		preReqInsert.setObject(i++,produit.getSel());
-		preReqInsert.setObject(i++,produit.getVitA());
-		preReqInsert.setObject(i++,produit.getVitD());
-		preReqInsert.setObject(i++,produit.getVitE());
-		preReqInsert.setObject(i++,produit.getVitK());
-		preReqInsert.setObject(i++,produit.getVitC());
-		preReqInsert.setObject(i++,produit.getVitB1());
-		preReqInsert.setObject(i++,produit.getVitB2());
-		preReqInsert.setObject(i++,produit.getVitPP());
-		preReqInsert.setObject(i++,produit.getVitB6());
-		preReqInsert.setObject(i++,produit.getVitB9());
-		preReqInsert.setObject(i++,produit.getVitB12());
-		preReqInsert.setObject(i++,produit.getCalcium());
-		preReqInsert.setObject(i++,produit.getMagnesium());
-		preReqInsert.setObject(i++,produit.getFer());
-		preReqInsert.setObject(i++,produit.getBetaCarotene());
-		preReqInsert.setBoolean(i++,produit.isPresenceHuilePalme());
-		preReqInsert.setObject(i++,produit.getPourcentageFruitsLegumes());
-		preReqInsert.setInt(i++,produit.getCategorie().getId());
-		preReqInsert.setInt(i++,produit.getMarque().getId());
-		//System.err.println(preReqInsert);
-		preReqInsert.executeUpdate();
-		
-		/** Insertion des ingrédients */
-		if(!produit.getListeIngredients().isEmpty()){
-			IngredientDao ingDao= new IngredientDaoJdbc(this.connection);
-			preReqInsertProdIng.setInt(1, produit.getId());
-			
-			for(Ingredient ingredient : produit.getListeIngredients()){
-				ingDao.insert(ingredient);
-				/** Insertion dans la table d'association PROD_ING */
-				preReqInsertProdIng.setInt(2, ingredient.getId());
-				preReqInsertProdIng.executeUpdate();
+			/** Insertion de la catégorie correspondante */
+			if(produit.getCategorie()!= null){
+				CategorieDao catDao= new CategorieDaoJdbc(this.connection);
+				catDao.insert(produit.getCategorie());
+				catDao= null;
 			}
-			ingDao= null;
-		}
-		
-		/** Insertion des allergènes */
-		if(!produit.getListeAllergenes().isEmpty()){
-			AllergeneDao allDao= new AllergeneDaoJdbc(this.connection);
-			preReqInsertProdAll.setInt(1, produit.getId());
 			
-			for(Allergene allergene : produit.getListeAllergenes()){
-				allDao.insert(allergene);
-				/** Insertion dans la table d'association PROD_ALL */
-				preReqInsertProdAll.setInt(2, allergene.getId());
-				preReqInsertProdAll.executeUpdate();
+			/** Insertion de la marque correspondante */
+			if(produit.getMarque()!= null){
+				MarqueDao mqDao= new MarqueDaoJdbc(this.connection);
+				mqDao.insert(produit.getMarque());
+				mqDao= null;
 			}
-			allDao= null;
-		}
-		
-		/** Insertion des additifs */
-		if(!produit.getListeAllergenes().isEmpty()){
-			AdditifDao addDao= new AdditifDaoJdbc(this.connection);
-			preReqInsertProdAdd.setInt(1, produit.getId());
 			
-			for(Additif additif : produit.getListeAdditifs()){
-				addDao.insert(additif);
-				/** Insertion dans la table d'association PROD_ADD */
-				preReqInsertProdAdd.setInt(2, additif.getId());
-				preReqInsertProdAdd.executeUpdate();
+			/** Insertion du produit */
+			int i= 1;
+			preReqInsert.setString(i++,produit.getNom());
+			preReqInsert.setString(i++,String.valueOf(produit.getScoreNutritionnel()));
+			preReqInsert.setObject(i++,produit.getEnergie());
+			preReqInsert.setObject(i++,produit.getGraisse());
+			preReqInsert.setObject(i++,produit.getGraisseSaturee());
+			preReqInsert.setObject(i++,produit.getHydratesCarbones());
+			preReqInsert.setObject(i++,produit.getSucres());
+			preReqInsert.setObject(i++,produit.getFibres());
+			preReqInsert.setObject(i++,produit.getProteines());
+			preReqInsert.setObject(i++,produit.getSel());
+			preReqInsert.setObject(i++,produit.getVitA());
+			preReqInsert.setObject(i++,produit.getVitD());
+			preReqInsert.setObject(i++,produit.getVitE());
+			preReqInsert.setObject(i++,produit.getVitK());
+			preReqInsert.setObject(i++,produit.getVitC());
+			preReqInsert.setObject(i++,produit.getVitB1());
+			preReqInsert.setObject(i++,produit.getVitB2());
+			preReqInsert.setObject(i++,produit.getVitPP());
+			preReqInsert.setObject(i++,produit.getVitB6());
+			preReqInsert.setObject(i++,produit.getVitB9());
+			preReqInsert.setObject(i++,produit.getVitB12());
+			preReqInsert.setObject(i++,produit.getCalcium());
+			preReqInsert.setObject(i++,produit.getMagnesium());
+			preReqInsert.setObject(i++,produit.getFer());
+			preReqInsert.setObject(i++,produit.getBetaCarotene());
+			preReqInsert.setBoolean(i++,produit.isPresenceHuilePalme());
+			preReqInsert.setObject(i++,produit.getPourcentageFruitsLegumes());
+			preReqInsert.setInt(i++,produit.getCategorie().getId());
+			preReqInsert.setInt(i++,produit.getMarque().getId());
+			//System.err.println(preReqInsert);
+			preReqInsert.executeUpdate();
+			
+			/** On récupère l'Id du produit inséré et on met à jour le produit */
+			ResultSet rs= preReqInsert.getGeneratedKeys();
+			if(rs.next()){
+				int id= rs.getInt(1);
+				produit.setId(id);
 			}
-			addDao= null;
+			rs.close();
+			
+			/** Insertion des ingrédients */
+			if(!produit.getListeIngredients().isEmpty()){
+				IngredientDao ingDao= new IngredientDaoJdbc(this.connection);
+				preReqInsertProdIng.setInt(1, produit.getId());
+				
+				for(Ingredient ingredient : produit.getListeIngredients()){
+					ingDao.insert(ingredient);
+					/** Insertion dans la table d'association PROD_ING */
+					preReqInsertProdIng.setInt(2, ingredient.getId());
+					preReqInsertProdIng.executeUpdate();
+				}
+				ingDao= null;
+			}
+			
+			/** Insertion des allergènes */
+			if(!produit.getListeAllergenes().isEmpty()){
+				AllergeneDao allDao= new AllergeneDaoJdbc(this.connection);
+				preReqInsertProdAll.setInt(1, produit.getId());
+				
+				for(Allergene allergene : produit.getListeAllergenes()){
+					allDao.insert(allergene);
+					/** Insertion dans la table d'association PROD_ALL */
+					preReqInsertProdAll.setInt(2, allergene.getId());
+					preReqInsertProdAll.executeUpdate();
+				}
+				allDao= null;
+			}
+			
+			/** Insertion des additifs */
+			if(!produit.getListeAdditifs().isEmpty()){
+				AdditifDao addDao= new AdditifDaoJdbc(this.connection);
+				preReqInsertProdAdd.setInt(1, produit.getId());
+				
+				for(Additif additif : produit.getListeAdditifs()){
+					addDao.insert(additif);
+					/** Insertion dans la table d'association PROD_ADD */
+					preReqInsertProdAdd.setInt(2, additif.getId());
+					preReqInsertProdAdd.executeUpdate();
+				}
+				addDao= null;
+			}
+		}else{
+			/** On met le produit à jour */
+			produit.setId(objExistant.getId());
 		}
 		
 	}

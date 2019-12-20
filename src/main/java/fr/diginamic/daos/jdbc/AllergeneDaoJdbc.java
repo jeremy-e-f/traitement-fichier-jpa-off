@@ -21,7 +21,8 @@ public class AllergeneDaoJdbc implements AllergeneDao {
 	 * Connexion nous permettant d'accéder à la base de données
 	 */
 	private Connection connection;
-	private PreparedStatement preReqSelect= null;
+	private PreparedStatement preReqSelectId= null;
+	private PreparedStatement preReqSelectName= null;
 	private PreparedStatement preReqInsert= null;
 	private PreparedStatement preReqUpdate= null;
 	private PreparedStatement preReqDelete= null;
@@ -43,9 +44,13 @@ public class AllergeneDaoJdbc implements AllergeneDao {
 	 */
 	private void initPreRequete(){
 		try {
-			preReqSelect = connection.prepareStatement("SELECT ID, LIBELLE FROM ALLERGENE WHERE ID = ?;");
+			String generatedColumns[] = { "ID" };
 			
-			preReqInsert = connection.prepareStatement("INSERT IGNORE INTO ALLERGENE(ID, LIBELLE) VALUES(?,?);");
+			preReqSelectId = connection.prepareStatement("SELECT ID, LIBELLE FROM ALLERGENE WHERE ID = ?;");
+			
+			preReqSelectName = connection.prepareStatement("SELECT ID, LIBELLE FROM ALLERGENE WHERE LIBELLE = ?;");
+			
+			preReqInsert = connection.prepareStatement("INSERT INTO ALLERGENE(LIBELLE) VALUES(?);", generatedColumns);
 			
 			preReqUpdate = connection.prepareStatement("UPDATE ALLERGENE SET LIBELLE = ? WHERE ID = ?;");
 			
@@ -60,7 +65,8 @@ public class AllergeneDaoJdbc implements AllergeneDao {
 	 */
 	public void finalize(){
           try {
-          	this.preReqSelect.close();
+          	this.preReqSelectId.close();
+          	this.preReqSelectName.close();
   			this.preReqInsert.close();
   			this.preReqUpdate.close();
   			this.preReqDelete.close();
@@ -72,14 +78,15 @@ public class AllergeneDaoJdbc implements AllergeneDao {
 	@Override
 	public List<Allergene> extraire() throws SQLException {
 		Statement monStatement= null;
-		ResultSet curseur= null;
+		ResultSet rs= null;
 		List<Allergene> listeAllergenes= new ArrayList<Allergene>();
 		
 		monStatement = connection.createStatement();
-		curseur= monStatement.executeQuery("SELECT * FROM ALLERGENE;");
-		while(curseur.next()){
-			listeAllergenes.add(new Allergene(curseur.getInt("ID"), curseur.getString("LIBELLE")));
+		rs= monStatement.executeQuery("SELECT * FROM ALLERGENE;");
+		while(rs.next()){
+			listeAllergenes.add(new Allergene(rs.getInt("ID"), rs.getString("LIBELLE")));
 		}
+		rs.close();
 		
 		return listeAllergenes;
 	}
@@ -88,23 +95,57 @@ public class AllergeneDaoJdbc implements AllergeneDao {
 	public Allergene getById(int id) throws SQLException {
 		Allergene allergene= null;
 		
-		preReqSelect.setInt(1, id);
-		ResultSet rs= preReqSelect.executeQuery();
+		preReqSelectId.setInt(1, id);
+		ResultSet rs= preReqSelectId.executeQuery();
 		if(rs.next()){
 			allergene= new Allergene(rs.getInt("ID"), rs.getString("LIBELLE"));
 		}
+		rs.close();
+		
+		return allergene;
+	}
+	
+	@Override
+	public Allergene getByName(String name) throws SQLException {
+		Allergene allergene= null;
+		
+		preReqSelectName.setString(1, name);
+		ResultSet rs= preReqSelectName.executeQuery();
+		if(rs.next()){
+			allergene= new Allergene(rs.getInt("ID"), rs.getString("LIBELLE"));
+		}
+		rs.close();
+		
 		return allergene;
 	}
 
 	@Override
-	public void insert(Allergene allergene) throws SQLException {
+	public int insert(Allergene allergene) throws SQLException {
 		if(allergene== null){
 			throw new SQLException("Valeur nulle!");
 		}
-		int i= 1;
-		preReqInsert.setInt(i++, allergene.getId());
-		preReqInsert.setString(i++, allergene.getLibelle());
-		preReqInsert.executeUpdate();
+		/** On vérifie si l'objet n'existe pas déjà dans la base de données */
+		Allergene objExistant= this.getByName(allergene.getLibelle());
+		if(objExistant!= null){
+			/** On le met à jour */
+			allergene.setId(objExistant.getId());
+			return objExistant.getId();
+		}else{
+			/** Sinon on l'insère dans la base de données */
+			preReqInsert.setString(1, allergene.getLibelle());
+			preReqInsert.executeUpdate();
+			/** Et récupère son Id */
+			ResultSet rs= preReqInsert.getGeneratedKeys();
+			int id= 0;
+			if(rs.next()){
+				id= rs.getInt(1);
+				/** On le met à jour */
+				allergene.setId(id);
+			}
+			rs.close();
+			
+			return id;
+		}
 	}
 
 	@Override

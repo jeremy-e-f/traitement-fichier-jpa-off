@@ -22,11 +22,19 @@ public interface AdditifDao {
 	Additif getById(int id) throws SQLException;
 	
 	/**
-	 * Insère un nouvel additif
-	 * @param additif
+	 * Récupère un additif par son libellé
+	 * @return Additif
 	 * @throws SQLException 
 	 */
-	void insert(Additif additif) throws SQLException;
+	Additif getByName(String name) throws SQLException;
+	
+	/**
+	 * Insère un additif
+	 * @param additif
+	 * @return retourne l'Id de l'objet dans la base de données
+	 * @throws SQLException 
+	 */
+	int insert(Additif additif) throws SQLException;
 	
 	/**
 	 * Met à jour l'additif passé en paramètre

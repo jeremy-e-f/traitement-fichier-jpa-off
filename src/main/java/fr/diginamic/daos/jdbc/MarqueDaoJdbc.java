@@ -21,7 +21,8 @@ public class MarqueDaoJdbc implements MarqueDao {
 	 * Connexion nous permettant d'accéder à la base de données
 	 */
 	private Connection connection;
-	private PreparedStatement preReqSelect= null;
+	private PreparedStatement preReqSelectId= null;
+	private PreparedStatement preReqSelectName= null;
 	private PreparedStatement preReqInsert= null;
 	private PreparedStatement preReqUpdate= null;
 	private PreparedStatement preReqDelete= null;
@@ -43,9 +44,13 @@ public class MarqueDaoJdbc implements MarqueDao {
 	 */
 	private void initPreRequete(){
 		try {
-			preReqSelect = connection.prepareStatement("SELECT ID, NOM FROM MARQUE WHERE ID = ?;");
+			String generatedColumns[] = { "ID" };
 			
-			preReqInsert = connection.prepareStatement("INSERT IGNORE INTO MARQUE(ID, NOM) VALUES(?,?);");
+			preReqSelectId = connection.prepareStatement("SELECT ID, NOM FROM MARQUE WHERE ID = ?;");
+			
+			preReqSelectName = connection.prepareStatement("SELECT ID, NOM FROM MARQUE WHERE NOM = ?;");
+			
+			preReqInsert = connection.prepareStatement("INSERT IGNORE INTO MARQUE(NOM) VALUES(?);", generatedColumns);
 			
 			preReqUpdate = connection.prepareStatement("UPDATE MARQUE SET NOM = ? WHERE ID = ?;");
 			
@@ -60,7 +65,8 @@ public class MarqueDaoJdbc implements MarqueDao {
 	 */
 	public void finalize(){
           try {
-          	this.preReqSelect.close();
+          	this.preReqSelectId.close();
+          	this.preReqSelectName.close();
   			this.preReqInsert.close();
   			this.preReqUpdate.close();
   			this.preReqDelete.close();
@@ -72,17 +78,18 @@ public class MarqueDaoJdbc implements MarqueDao {
 	@Override
 	public List<Marque> extraire() throws SQLException {
 		Statement monStatement= null;
-		ResultSet curseur= null;
+		ResultSet rs= null;
 		List<Marque> listeMarques= new ArrayList<Marque>();
 		
 		monStatement = connection.createStatement();
-		curseur= monStatement.executeQuery("SELECT * FROM MARQUE;");
-		while(curseur.next()){
-			int idCat= curseur.getInt("ID");
-			String nomCat= curseur.getString("NOM");
+		rs= monStatement.executeQuery("SELECT * FROM MARQUE;");
+		while(rs.next()){
+			int idCat= rs.getInt("ID");
+			String nomCat= rs.getString("NOM");
 			
 			listeMarques.add(new Marque(idCat, nomCat));
 		}
+		rs.close();
 		
 		return listeMarques;
 	}
@@ -91,23 +98,57 @@ public class MarqueDaoJdbc implements MarqueDao {
 	public Marque getById(int id) throws SQLException {
 		Marque marque= null;
 		
-		preReqSelect.setInt(1, id);
-		ResultSet rs= preReqSelect.executeQuery();
+		preReqSelectId.setInt(1, id);
+		ResultSet rs= preReqSelectId.executeQuery();
 		if(rs.next()){
 			marque= new Marque(rs.getInt("ID"), rs.getString("NOM"));
 		}
+		rs.close();
+		
+		return marque;
+	}
+	
+	@Override
+	public Marque getByName(String name) throws SQLException {
+		Marque marque= null;
+		
+		preReqSelectName.setString(1, name);
+		ResultSet rs= preReqSelectName.executeQuery();
+		if(rs.next()){
+			marque= new Marque(rs.getInt("ID"), rs.getString("NOM"));
+		}
+		rs.close();
+		
 		return marque;
 	}
 
 	@Override
-	public void insert(Marque marque) throws SQLException {
+	public int insert(Marque marque) throws SQLException {
 		if(marque== null){
 			throw new SQLException("Valeur nulle!");
 		}
-		int i= 1;
-		preReqInsert.setInt(i++, marque.getId());
-		preReqInsert.setString(i++, marque.getNom());
-		preReqInsert.executeUpdate();
+		/** On vérifie si l'objet n'existe pas déjà dans la base de données */
+		Marque objExistant= this.getByName(marque.getNom());
+		if(objExistant!= null){
+			/** On le met à jour */
+			marque.setId(objExistant.getId());
+			return objExistant.getId();
+		}else{
+			/** Sinon on l'insère dans la base de données */
+			preReqInsert.setString(1, marque.getNom());
+			preReqInsert.executeUpdate();
+			/** Et récupère son Id */
+			ResultSet rs= preReqInsert.getGeneratedKeys();
+			int id= 0;
+			if(rs.next()){
+				id= rs.getInt(1);
+				/** On le met à jour */
+				marque.setId(id);
+			}
+			rs.close();
+			
+			return id;
+		}
 	}
 
 	@Override

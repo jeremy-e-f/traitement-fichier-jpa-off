@@ -22,11 +22,19 @@ public interface CategorieDao {
 	Categorie getById(int id) throws SQLException;
 	
 	/**
-	 * Insère une nouvelle catégorie
-	 * @param categorie
+	 * Récupère une catégorie par son libellé
+	 * @return Categorie
 	 * @throws SQLException 
 	 */
-	void insert(Categorie categorie) throws SQLException;
+	Categorie getByName(String name) throws SQLException;
+	
+	/**
+	 * Insère une catégorie
+	 * @param categorie
+	 * @return retourne l'Id de l'objet dans la base de données
+	 * @throws SQLException 
+	 */
+	int insert(Categorie categorie) throws SQLException;
 	
 	/**
 	 * Met à jour la catégorie passée en paramètre

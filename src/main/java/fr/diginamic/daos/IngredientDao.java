@@ -22,11 +22,19 @@ public interface IngredientDao {
 	Ingredient getById(int id) throws SQLException;
 	
 	/**
-	 * Insère un nouvel ingrédient
-	 * @param ingredient
+	 * Récupère un ingrédient par son libellé
+	 * @return Ingredient
 	 * @throws SQLException 
 	 */
-	void insert(Ingredient ingredient) throws SQLException;
+	Ingredient getByName(String name) throws SQLException;
+	
+	/**
+	 * Insère un nouvel ingrédient
+	 * @param ingredient
+	 * @return retourne l'Id de l'objet dans la base de données
+	 * @throws SQLException 
+	 */
+	int insert(Ingredient ingredient) throws SQLException;
 	
 	/**
 	 * Met à jour l'ingrédient passé en paramètre

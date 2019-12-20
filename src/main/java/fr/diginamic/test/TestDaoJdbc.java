@@ -18,7 +18,7 @@ public class TestDaoJdbc {
 	public void produitDaoGetById(){
 		ProduitDao produitDao= new ProduitDaoJdbc();
 		Produit produit= null;
-		produit = produitDao.getById(1);
+		produit = produitDao.getByNameMarque("Pepites de graines germés", "BIScru");
 		System.out.println(produit);
 		assert produit!= null;
 	}

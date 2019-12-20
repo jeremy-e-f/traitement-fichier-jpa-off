@@ -21,7 +21,8 @@ public class AdditifDaoJdbc implements AdditifDao {
 	 * Connexion nous permettant d'accéder à la base de données
 	 */
 	private Connection connection;
-	private PreparedStatement preReqSelect= null;
+	private PreparedStatement preReqSelectId= null;
+	private PreparedStatement preReqSelectName= null;
 	private PreparedStatement preReqInsert= null;
 	private PreparedStatement preReqUpdate= null;
 	private PreparedStatement preReqDelete= null;
@@ -43,9 +44,13 @@ public class AdditifDaoJdbc implements AdditifDao {
 	 */
 	private void initPreRequete(){
 		try {
-			preReqSelect = connection.prepareStatement("SELECT ID, LIBELLE FROM ADDITIF WHERE ID = ?;");
+			String generatedColumns[] = { "ID" };
 			
-			preReqInsert = connection.prepareStatement("INSERT IGNORE INTO ADDITIF(ID, LIBELLE) VALUES(?,?);");
+			preReqSelectId = connection.prepareStatement("SELECT ID, LIBELLE FROM ADDITIF WHERE ID = ?;");
+			
+			preReqSelectName = connection.prepareStatement("SELECT ID, LIBELLE FROM ADDITIF WHERE LIBELLE = ?;");
+			
+			preReqInsert = connection.prepareStatement("INSERT IGNORE INTO ADDITIF(LIBELLE) VALUES(?);", generatedColumns);
 			
 			preReqUpdate = connection.prepareStatement("UPDATE ADDITIF SET LIBELLE = ? WHERE ID = ?;");
 			
@@ -60,7 +65,8 @@ public class AdditifDaoJdbc implements AdditifDao {
 	 */
 	public void finalize(){
           try {
-        	this.preReqSelect.close();
+        	this.preReqSelectId.close();
+        	this.preReqSelectName.close();
   			this.preReqInsert.close();
   			this.preReqUpdate.close();
   			this.preReqDelete.close();
@@ -72,14 +78,15 @@ public class AdditifDaoJdbc implements AdditifDao {
 	@Override
 	public List<Additif> extraire() throws SQLException {
 		Statement monStatement= null;
-		ResultSet curseur= null;
+		ResultSet rs= null;
 		List<Additif> listeAdditifs= new ArrayList<Additif>();
 		
 		monStatement = connection.createStatement();
-		curseur= monStatement.executeQuery("SELECT * FROM ADDITIF;");
-		while(curseur.next()){
-			listeAdditifs.add(new Additif(curseur.getInt("ID"), curseur.getString("LIBELLE")));
+		rs= monStatement.executeQuery("SELECT * FROM ADDITIF;");
+		while(rs.next()){
+			listeAdditifs.add(new Additif(rs.getInt("ID"), rs.getString("LIBELLE")));
 		}
+		rs.close();
 		
 		return listeAdditifs;
 	}
@@ -88,23 +95,54 @@ public class AdditifDaoJdbc implements AdditifDao {
 	public Additif getById(int id) throws SQLException {
 		Additif additif= null;
 		
-		preReqSelect.setInt(1, id);
-		ResultSet rs= preReqSelect.executeQuery();
+		preReqSelectId.setInt(1, id);
+		ResultSet rs= preReqSelectId.executeQuery();
 		if(rs.next()){
 			additif= new Additif(rs.getInt("ID"), rs.getString("LIBELLE"));
 		}
+		rs.close();
+		return additif;
+	}
+	
+	@Override
+	public Additif getByName(String name) throws SQLException {
+		Additif additif= null;
+		
+		preReqSelectName.setString(1, name);
+		ResultSet rs= preReqSelectName.executeQuery();
+		if(rs.next()){
+			additif= new Additif(rs.getInt("ID"), rs.getString("LIBELLE"));
+		}
+		rs.close();
 		return additif;
 	}
 
 	@Override
-	public void insert(Additif additif) throws SQLException {
+	public int insert(Additif additif) throws SQLException {
 		if(additif== null){
 			throw new SQLException("Valeur nulle!");
 		}
-		int i= 1;
-		preReqInsert.setInt(i++, additif.getId());
-		preReqInsert.setString(i++, additif.getLibelle());
-		preReqInsert.executeUpdate();
+		/** On vérifie si l'objet n'existe pas déjà dans la base de données */
+		Additif objExistant= this.getByName(additif.getLibelle());
+		if(objExistant!= null){
+			/** On le met à jour */
+			additif.setId(objExistant.getId());
+			return objExistant.getId();
+		}else{
+			/** Sinon on l'insère dans la base de données */
+			preReqInsert.setString(1, additif.getLibelle());
+			preReqInsert.executeUpdate();
+			/** Et récupère son Id */
+			ResultSet rs= preReqInsert.getGeneratedKeys();
+			int id= 0;
+			if(rs.next()){
+				id= rs.getInt(1);
+				/** On le met à jour */
+				additif.setId(id);
+			}
+			rs.close();
+			return id;
+		}
 	}
 
 	@Override

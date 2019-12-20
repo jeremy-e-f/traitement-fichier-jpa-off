@@ -21,7 +21,8 @@ public class IngredientDaoJdbc implements IngredientDao {
 	 * Connexion nous permettant d'accéder à la base de données
 	 */
 	private Connection connection;
-	private PreparedStatement preReqSelect= null;
+	private PreparedStatement preReqSelectId= null;
+	private PreparedStatement preReqSelectName= null;
 	private PreparedStatement preReqInsert= null;
 	private PreparedStatement preReqUpdate= null;
 	private PreparedStatement preReqDelete= null;
@@ -43,9 +44,13 @@ public class IngredientDaoJdbc implements IngredientDao {
 	 */
 	private void initPreRequete(){
 		try {
-			preReqSelect = connection.prepareStatement("SELECT ID, LIBELLE FROM INGREDIENT WHERE ID = ?;");
+			String generatedColumns[] = { "ID" };
 			
-			preReqInsert = connection.prepareStatement("INSERT IGNORE INTO INGREDIENT(ID, LIBELLE) VALUES(?,?);");
+			preReqSelectId = connection.prepareStatement("SELECT ID, LIBELLE FROM INGREDIENT WHERE ID = ?;");
+			
+			preReqSelectName = connection.prepareStatement("SELECT ID, LIBELLE FROM INGREDIENT WHERE LIBELLE = ?;");
+			
+			preReqInsert = connection.prepareStatement("INSERT INTO INGREDIENT(LIBELLE) VALUES(?);", generatedColumns);
 			
 			preReqUpdate = connection.prepareStatement("UPDATE INGREDIENT SET LIBELLE = ? WHERE ID = ?;");
 			
@@ -60,7 +65,8 @@ public class IngredientDaoJdbc implements IngredientDao {
 	 */
 	public void finalize(){
           try {
-          	this.preReqSelect.close();
+          	this.preReqSelectId.close();
+          	this.preReqSelectName.close();
   			this.preReqInsert.close();
   			this.preReqUpdate.close();
   			this.preReqDelete.close();
@@ -72,14 +78,15 @@ public class IngredientDaoJdbc implements IngredientDao {
 	@Override
 	public List<Ingredient> extraire() throws SQLException {
 		Statement monStatement= null;
-		ResultSet curseur= null;
+		ResultSet rs= null;
 		List<Ingredient> listeIngredients= new ArrayList<Ingredient>();
 		
 		monStatement = connection.createStatement();
-		curseur= monStatement.executeQuery("SELECT * FROM INGREDIENT;");
-		while(curseur.next()){
-			listeIngredients.add(new Ingredient(curseur.getInt("ID"), curseur.getString("LIBELLE")));
+		rs= monStatement.executeQuery("SELECT * FROM INGREDIENT;");
+		while(rs.next()){
+			listeIngredients.add(new Ingredient(rs.getInt("ID"), rs.getString("LIBELLE")));
 		}
+		rs.close();
 		
 		return listeIngredients;
 	}
@@ -88,23 +95,57 @@ public class IngredientDaoJdbc implements IngredientDao {
 	public Ingredient getById(int id) throws SQLException {
 		Ingredient ingredient= null;
 		
-		preReqSelect.setInt(1, id);
-		ResultSet rs= preReqSelect.executeQuery();
+		preReqSelectId.setInt(1, id);
+		ResultSet rs= preReqSelectId.executeQuery();
 		if(rs.next()){
 			ingredient= new Ingredient(rs.getInt("ID"), rs.getString("LIBELLE"));
 		}
+		rs.close();
+		
+		return ingredient;
+	}
+	
+	@Override
+	public Ingredient getByName(String name) throws SQLException {
+		Ingredient ingredient= null;
+		
+		preReqSelectName.setString(1, name);
+		ResultSet rs= preReqSelectName.executeQuery();
+		if(rs.next()){
+			ingredient= new Ingredient(rs.getInt("ID"), rs.getString("LIBELLE"));
+		}
+		rs.close();
+		
 		return ingredient;
 	}
 
 	@Override
-	public void insert(Ingredient ingredient) throws SQLException {
+	public int insert(Ingredient ingredient) throws SQLException {
 		if(ingredient== null){
 			throw new SQLException("Valeur nulle!");
 		}
-		int i= 1;
-		preReqInsert.setInt(i++, ingredient.getId());
-		preReqInsert.setString(i++, ingredient.getLibelle());
-		preReqInsert.executeUpdate();
+		/** On vérifie si l'objet n'existe pas déjà dans la base de données */
+		Ingredient objExistant= this.getByName(ingredient.getLibelle());
+		if(objExistant!= null){
+			/** On le met à jour */
+			ingredient.setId(objExistant.getId());
+			return objExistant.getId();
+		}else{
+			/** Sinon on l'insère dans la base de données */
+			preReqInsert.setString(1, ingredient.getLibelle());
+			preReqInsert.executeUpdate();
+			/** Et récupère son Id */
+			ResultSet rs= preReqInsert.getGeneratedKeys();
+			int id= 0;
+			if(rs.next()){
+				id= rs.getInt(1);
+				/** On le met à jour */
+				ingredient.setId(id);
+			}
+			rs.close();
+			
+			return id;
+		}
 	}
 
 	@Override

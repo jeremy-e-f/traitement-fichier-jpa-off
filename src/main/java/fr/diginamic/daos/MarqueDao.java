@@ -22,11 +22,19 @@ public interface MarqueDao {
 	Marque getById(int id) throws SQLException;
 	
 	/**
-	 * Insère une nouvelle marque
-	 * @param marque
+	 * Récupère une marque par son nom
+	 * @return Marque
 	 * @throws SQLException 
 	 */
-	void insert(Marque marque) throws SQLException;
+	Marque getByName(String name) throws SQLException;
+	
+	/**
+	 * Insère une marque
+	 * @param marque
+	 * @return retourne l'Id de l'objet dans la base de données
+	 * @throws SQLException 
+	 */
+	int insert(Marque marque) throws SQLException;
 	
 	/**
 	 * Met à jour la marque passée en paramètre

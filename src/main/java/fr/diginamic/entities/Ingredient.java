@@ -27,7 +27,7 @@ public class Ingredient {
 	@Column(name="ID")
 	private int id;							/** Identifiant */
 	
-	@Column(name="LIBELLE", nullable= false, unique = true)
+	@Column(name="LIBELLE", nullable= false, unique = true, columnDefinition = "TEXT")
 	private String libelle;					/** Libellé de l'ingrédient */
 	
 	@ManyToMany

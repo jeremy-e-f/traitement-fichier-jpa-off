@@ -7,11 +7,11 @@ import fr.diginamic.entities.Produit;
 public interface ProduitDao {
 	
 	/**
-	 * Récupère un produit par son ID
+	 * Récupère un produit par son nom et le nom de sa marque
 	 * @return Produit
 	 * @throws SQLException 
 	 */
-	Produit getById(int id);
+	Produit getByNameMarque(String nomProduit, String nomMarque);
 	
 	/**
 	 * Insère un nouvel produit

@@ -21,7 +21,8 @@ public class CategorieDaoJdbc implements CategorieDao {
 	 * Connexion nous permettant d'accéder à la base de données
 	 */
 	private Connection connection;
-	private PreparedStatement preReqSelect= null;
+	private PreparedStatement preReqSelectId= null;
+	private PreparedStatement preReqSelectName= null;
 	private PreparedStatement preReqInsert= null;
 	private PreparedStatement preReqUpdate= null;
 	private PreparedStatement preReqDelete= null;
@@ -43,9 +44,13 @@ public class CategorieDaoJdbc implements CategorieDao {
 	 */
 	private void initPreRequete(){
 		try {
-			preReqSelect = connection.prepareStatement("SELECT ID, LIBELLE FROM CATEGORIE WHERE ID = ?;");
+			String generatedColumns[] = { "ID" };
 			
-			preReqInsert = connection.prepareStatement("INSERT IGNORE INTO CATEGORIE(ID, LIBELLE) VALUES(?,?);");
+			preReqSelectId = connection.prepareStatement("SELECT ID, LIBELLE FROM CATEGORIE WHERE ID = ?;");
+			
+			preReqSelectName = connection.prepareStatement("SELECT ID, LIBELLE FROM CATEGORIE WHERE LIBELLE = ?;");
+			
+			preReqInsert = connection.prepareStatement("INSERT INTO CATEGORIE(LIBELLE) VALUES(?);", generatedColumns);
 			
 			preReqUpdate = connection.prepareStatement("UPDATE CATEGORIE SET LIBELLE = ? WHERE ID = ?;");
 			
@@ -60,7 +65,8 @@ public class CategorieDaoJdbc implements CategorieDao {
 	 */
 	public void finalize(){
           try {
-          	this.preReqSelect.close();
+          	this.preReqSelectId.close();
+          	this.preReqSelectName.close();
   			this.preReqInsert.close();
   			this.preReqUpdate.close();
   			this.preReqDelete.close();
@@ -72,17 +78,18 @@ public class CategorieDaoJdbc implements CategorieDao {
 	@Override
 	public List<Categorie> extraire() throws SQLException {
 		Statement monStatement= null;
-		ResultSet curseur= null;
+		ResultSet rs= null;
 		List<Categorie> listeCategories= new ArrayList<Categorie>();
 		
 		monStatement = connection.createStatement();
-		curseur= monStatement.executeQuery("SELECT * FROM CATEGORIE;");
-		while(curseur.next()){
-			int idCat= curseur.getInt("ID");
-			String libelleCat= curseur.getString("LIBELLE");
+		rs= monStatement.executeQuery("SELECT * FROM CATEGORIE;");
+		while(rs.next()){
+			int idCat= rs.getInt("ID");
+			String libelleCat= rs.getString("LIBELLE");
 			
 			listeCategories.add(new Categorie(idCat, libelleCat));
 		}
+		rs.close();
 		
 		return listeCategories;
 	}
@@ -91,23 +98,57 @@ public class CategorieDaoJdbc implements CategorieDao {
 	public Categorie getById(int id) throws SQLException {
 		Categorie categorie= null;
 		
-		preReqSelect.setInt(1, id);
-		ResultSet rs= preReqSelect.executeQuery();
+		preReqSelectId.setInt(1, id);
+		ResultSet rs= preReqSelectId.executeQuery();
 		if(rs.next()){
 			categorie= new Categorie(rs.getInt("ID"), rs.getString("LIBELLE"));
 		}
+		rs.close();
+		
+		return categorie;
+	}
+	
+	@Override
+	public Categorie getByName(String name) throws SQLException {
+		Categorie categorie= null;
+		
+		preReqSelectName.setString(1, name);
+		ResultSet rs= preReqSelectName.executeQuery();
+		if(rs.next()){
+			categorie= new Categorie(rs.getInt("ID"), rs.getString("LIBELLE"));
+		}
+		rs.close();
+		
 		return categorie;
 	}
 
 	@Override
-	public void insert(Categorie categorie) throws SQLException {
+	public int insert(Categorie categorie) throws SQLException {
 		if(categorie== null){
 			throw new SQLException("Valeur nulle!");
 		}
-		int i= 1;
-		preReqInsert.setInt(i++, categorie.getId());
-		preReqInsert.setString(i++, categorie.getLibelle());
-		preReqInsert.executeUpdate();
+		/** On vérifie si l'objet n'existe pas déjà dans la base de données */
+		Categorie objExistant= this.getByName(categorie.getLibelle());
+		if(objExistant!= null){
+			/** On le met à jour */
+			categorie.setId(objExistant.getId());
+			return objExistant.getId();
+		}else{
+			/** Sinon on l'insère dans la base de données */
+			preReqInsert.setString(1, categorie.getLibelle());
+			preReqInsert.executeUpdate();
+			/** Et récupère son Id */
+			ResultSet rs= preReqInsert.getGeneratedKeys();
+			int id= 0;
+			if(rs.next()){
+				id= rs.getInt(1);
+				/** On le met à jour */
+				categorie.setId(id);
+			}
+			rs.close();
+			
+			return id;
+		}
 	}
 
 	@Override

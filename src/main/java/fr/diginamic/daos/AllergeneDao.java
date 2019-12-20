@@ -22,11 +22,19 @@ public interface AllergeneDao {
 	Allergene getById(int id) throws SQLException;
 	
 	/**
-	 * Insère un nouvel allergène
-	 * @param allergene
+	 * Récupère un allergène par son libellé
+	 * @return Allergene
 	 * @throws SQLException 
 	 */
-	void insert(Allergene allergene) throws SQLException;
+	Allergene getByName(String name) throws SQLException;
+	
+	/**
+	 * Insère un allergènes
+	 * @param allergene
+	 * @return retourne l'Id de l'objet dans la base de données
+	 * @throws SQLException 
+	 */
+	int insert(Allergene allergene) throws SQLException;
 	
 	/**
 	 * Met à jour l'allergène passé en paramètre
