@@ -74,6 +74,7 @@ public class IntegrationOpenFoodFacts {
 		/** On initialise la connection à la base de données */
 		Connection connection= ConnectionJDBC.getInstance();
 		Long debut= 0L, fin= 0L;
+		int i= 0, taille= 0;
 		/** On recupère les ressources extraites dans un objet de type Stock */
 		Stock stock= refFile.getStock();
 		
@@ -87,10 +88,17 @@ public class IntegrationOpenFoodFacts {
 			LOG.debug("Enregistrement des ingrédients...");
 			debut= System.currentTimeMillis();
 			IngredientDao ingDao= new IngredientDaoJdbc(connection);
+			i= 0; 
+			taille= stock.getListeIngredients().values().size();
 			for(Ingredient ing : stock.getListeIngredients().values()){
+				if(i%200== 0){
+					LOG.debug("=> "+Math.floor((double)i/taille*10000)/100+"% ("+i+"/"+taille+") lignes");
+				}
 				ingDao.insert(ing);
+				i++;
 			}
 			fin= System.currentTimeMillis();
+			LOG.debug("=> 100% ("+taille+"/"+taille+") lignes");
 			LOG.debug("Effectué avec succès en "+(fin-debut)+" ms.");
 			
 			/**
@@ -147,7 +155,8 @@ public class IntegrationOpenFoodFacts {
 			LOG.debug("Enregistrement des produits...");
 			debut= System.currentTimeMillis();
 			ProduitDao prodDao= new ProduitDaoJdbc(connection);
-			int i= 0, taille= stock.getListeProduits().size();
+			i= 0; 
+			taille= stock.getListeProduits().size();
 			for(Produit prod : stock.getListeProduits()){
 				if(i%200== 0){
 					LOG.debug("=> "+Math.floor((double)i/taille*10000)/100+"% ("+i+"/"+taille+") lignes");
@@ -156,6 +165,7 @@ public class IntegrationOpenFoodFacts {
 				i++;
 			}
 			fin= System.currentTimeMillis();
+			LOG.debug("=> 100% ("+taille+"/"+taille+") lignes");
 			LOG.debug("Effectué avec succès en "+(fin-debut)+" ms.");
 			
 			/** Si la séquence s'est déroulée jusqu'au bout, on valide le tout */

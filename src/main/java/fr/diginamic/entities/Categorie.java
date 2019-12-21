@@ -37,7 +37,6 @@ public class Categorie {
 	}
 	
 	public Categorie(String libelle) {
-		this.id = id;
 		this.libelle = libelle;
 	}
 	

@@ -101,16 +101,18 @@ public class ProduitDaoJdbc implements ProduitDao {
 			LOG.error("Nom du produit ou de la marque manquante.");
 			return null;
 		}
-		nomProduit= nomProduit.trim().replace("'", "''");
-		nomMarque= nomMarque.trim().replace("'", "''");
+		nomProduit= nomProduit.trim();
+		nomMarque= nomMarque.trim();
 		
 		Produit produit= null;
-		Statement monStatement= null;
+		PreparedStatement monStatement= null;
 		ResultSet rs= null;
 		
 		try {
-			monStatement = connection.createStatement();
-			rs= monStatement.executeQuery("SELECT * FROM PRODUIT p JOIN Marque mq ON(p.ID_MQ = mq.ID) WHERE p.NOM= '"+nomProduit+"' AND mq.NOM= '"+nomMarque+"';");
+			monStatement = connection.prepareStatement("SELECT * FROM PRODUIT p JOIN Marque mq ON(p.ID_MQ = mq.ID) WHERE p.NOM= ? AND mq.NOM= ?;");
+			monStatement.setString(1, nomProduit);
+			monStatement.setString(2, nomMarque);
+			rs= monStatement.executeQuery();
 			if(rs.next()){
 				/** On récupère les données du produit */
 				int idProduit = rs.getInt("p.ID");
@@ -205,6 +207,43 @@ public class ProduitDaoJdbc implements ProduitDao {
 		}
 		return produit;
 	}
+	
+	@Override
+	public int getId(String nomProduit, String nomMarque) {
+		int id= 0;
+		
+		/** On vérifie les paramètres */
+		if(nomProduit== null || nomMarque== null){
+			LOG.error("Nom du produit ou de la marque manquante.");
+			return id;
+		}
+		nomProduit= nomProduit.trim();
+		nomMarque= nomMarque.trim();
+
+		PreparedStatement monStatement= null;
+		ResultSet rs= null;
+		
+		try {
+			monStatement = connection.prepareStatement("SELECT p.ID FROM PRODUIT p JOIN Marque mq ON(p.ID_MQ = mq.ID) WHERE p.NOM= ? AND mq.NOM= ?");
+			monStatement.setString(1, nomProduit);
+			monStatement.setString(2, nomMarque);
+			rs= monStatement.executeQuery();
+			if(rs.next()){
+				id= rs.getInt(1);
+			}
+			rs.close();
+			
+		} catch (SQLException e) {
+			LOG.error(e.getMessage());
+		} finally {
+			try {
+				monStatement.close();
+			} catch (SQLException e) {
+				LOG.error(e.getMessage());
+			}
+		}
+		return id;
+	}
 
 	@Override
 	public void insert(Produit produit) throws SQLException {
@@ -212,10 +251,10 @@ public class ProduitDaoJdbc implements ProduitDao {
 			throw new SQLException("Valeur nulle!");
 		}
 		
-		Produit objExistant= this.getByNameMarque(produit.getNom(), produit.getMarque().getNom());
+		int id= this.getId(produit.getNom(), produit.getMarque().getNom());
 		
 		/** Si le produit n'existe pas, on le cree */
-		if(objExistant== null){
+		if(id== 0){
 		
 			/** Insertion de la catégorie correspondante */
 			if(produit.getCategorie()!= null){
@@ -268,7 +307,7 @@ public class ProduitDaoJdbc implements ProduitDao {
 			/** On récupère l'Id du produit inséré et on met à jour le produit */
 			ResultSet rs= preReqInsert.getGeneratedKeys();
 			if(rs.next()){
-				int id= rs.getInt(1);
+				id= rs.getInt(1);
 				produit.setId(id);
 			}
 			rs.close();
@@ -316,7 +355,7 @@ public class ProduitDaoJdbc implements ProduitDao {
 			}
 		}else{
 			/** On met le produit à jour */
-			produit.setId(objExistant.getId());
+			produit.setId(id);
 		}
 		
 	}
