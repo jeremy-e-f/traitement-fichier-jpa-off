@@ -17,13 +17,6 @@ public class Stock {
 	private HashMap<String,Categorie> listeCategories;		/** Liste des catégories */
 	private HashMap<String,Marque> listeMarques;			/** Liste des marques */
 	
-	/** Compteurs internes */
-	private int idAdd= 1;
-	private int idIng= 1;
-	private int idAll= 1;
-	private int idCat= 1;
-	private int idMq= 1;
-	
 	/**
 	 * Constructeur
 	 */
@@ -55,7 +48,7 @@ public class Stock {
 		if(element!= null){
 			return element;
 		}
-		element= new Allergene(idAll++, libelle);
+		element= new Allergene(libelle);
 		listeAllergenes.put(libelle, element);
 		return element;
 	}
@@ -74,7 +67,7 @@ public class Stock {
 		if(element!= null){
 			return element;
 		}
-		element= new Categorie(idCat++, libelle);
+		element= new Categorie(libelle);
 		listeCategories.put(libelle, element);
 		return element;
 	}
@@ -92,7 +85,7 @@ public class Stock {
 		if(element!= null){
 			return element;
 		}
-		element= new Ingredient(idIng++, libelle);
+		element= new Ingredient(libelle);
 		listeIngredients.put(libelle, element);
 		return element;
 	}
@@ -110,7 +103,7 @@ public class Stock {
 		if(element!= null){
 			return element;
 		}
-		element= new Additif(idAdd++, libelle);
+		element= new Additif(libelle);
 		listeAdditifs.put(libelle, element);
 		return element;
 	}
@@ -128,7 +121,7 @@ public class Stock {
 		if(element!= null){
 			return element;
 		}
-		element= new Marque(idMq++, nom);
+		element= new Marque(nom);
 		listeMarques.put(nom, element);
 		return element;
 	}

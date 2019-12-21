@@ -36,9 +36,14 @@ public class Categorie {
 	public Categorie(){	
 	}
 	
-	public Categorie(int id, String libelle) {
+	public Categorie(String libelle) {
 		this.id = id;
 		this.libelle = libelle;
+	}
+	
+	public Categorie(int id, String libelle) {
+		this(libelle);
+		this.id = id;
 	}
 
 	/** Getter

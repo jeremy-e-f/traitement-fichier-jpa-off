@@ -124,27 +124,34 @@ public class IngredientDaoJdbc implements IngredientDao {
 		if(ingredient== null){
 			throw new SQLException("Valeur nulle!");
 		}
-		/** On vérifie si l'objet n'existe pas déjà dans la base de données */
-		Ingredient objExistant= this.getByName(ingredient.getLibelle());
-		if(objExistant!= null){
-			/** On le met à jour */
-			ingredient.setId(objExistant.getId());
-			return objExistant.getId();
-		}else{
-			/** Sinon on l'insère dans la base de données */
-			preReqInsert.setString(1, ingredient.getLibelle());
-			preReqInsert.executeUpdate();
-			/** Et récupère son Id */
-			ResultSet rs= preReqInsert.getGeneratedKeys();
-			int id= 0;
-			if(rs.next()){
-				id= rs.getInt(1);
+		
+		/** Si l'index dans la base de données n'a pas été initialisé */
+		if(ingredient.getId()== 0){
+		
+			/** On vérifie si l'objet n'existe pas déjà dans la base de données */
+			Ingredient objExistant= this.getByName(ingredient.getLibelle());
+			if(objExistant!= null){
 				/** On le met à jour */
-				ingredient.setId(id);
+				ingredient.setId(objExistant.getId());
+				return objExistant.getId();
+			}else{
+				/** Sinon on l'insère dans la base de données */
+				preReqInsert.setString(1, ingredient.getLibelle());
+				preReqInsert.executeUpdate();
+				/** Et récupère son Id */
+				ResultSet rs= preReqInsert.getGeneratedKeys();
+				int id= 0;
+				if(rs.next()){
+					id= rs.getInt(1);
+					/** On le met à jour */
+					ingredient.setId(id);
+				}
+				rs.close();
+				
+				return id;
 			}
-			rs.close();
-			
-			return id;
+		}else{
+			return ingredient.getId();
 		}
 	}
 

@@ -69,8 +69,8 @@ public class RessourcesFile{
 		try {
 			/** On extrait les lignes du fichier */
 			List<String> lignes = FileUtils.readLines(file, "UTF-8");
-			//for(int id= 1; id< 1000; id++){
-			for(int id= 1; id< lignes.size(); id++){
+			for(int id= 1; id< 10000; id++){
+			//for(int id= 1; id< lignes.size(); id++){
 				//System.out.println(lignes.get(id));
 				/** On les décompose */
 				String elements[]= lignes.get(id).split("\\|");

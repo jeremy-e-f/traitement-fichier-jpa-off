@@ -127,27 +127,34 @@ public class MarqueDaoJdbc implements MarqueDao {
 		if(marque== null){
 			throw new SQLException("Valeur nulle!");
 		}
-		/** On vérifie si l'objet n'existe pas déjà dans la base de données */
-		Marque objExistant= this.getByName(marque.getNom());
-		if(objExistant!= null){
-			/** On le met à jour */
-			marque.setId(objExistant.getId());
-			return objExistant.getId();
-		}else{
-			/** Sinon on l'insère dans la base de données */
-			preReqInsert.setString(1, marque.getNom());
-			preReqInsert.executeUpdate();
-			/** Et récupère son Id */
-			ResultSet rs= preReqInsert.getGeneratedKeys();
-			int id= 0;
-			if(rs.next()){
-				id= rs.getInt(1);
-				/** On le met à jour */
-				marque.setId(id);
-			}
-			rs.close();
+		
+		/** Si l'index dans la base de données n'a pas été initialisé */
+		if(marque.getId()== 0){
 			
-			return id;
+			/** On vérifie si l'objet n'existe pas déjà dans la base de données */
+			Marque objExistant= this.getByName(marque.getNom());
+			if(objExistant!= null){
+				/** On le met à jour */
+				marque.setId(objExistant.getId());
+				return objExistant.getId();
+			}else{
+				/** Sinon on l'insère dans la base de données */
+				preReqInsert.setString(1, marque.getNom());
+				preReqInsert.executeUpdate();
+				/** Et récupère son Id */
+				ResultSet rs= preReqInsert.getGeneratedKeys();
+				int id= 0;
+				if(rs.next()){
+					id= rs.getInt(1);
+					/** On le met à jour */
+					marque.setId(id);
+				}
+				rs.close();
+				
+				return id;
+			}
+		}else{
+			return marque.getId();
 		}
 	}
 

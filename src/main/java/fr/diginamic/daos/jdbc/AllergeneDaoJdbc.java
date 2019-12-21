@@ -124,27 +124,34 @@ public class AllergeneDaoJdbc implements AllergeneDao {
 		if(allergene== null){
 			throw new SQLException("Valeur nulle!");
 		}
-		/** On vérifie si l'objet n'existe pas déjà dans la base de données */
-		Allergene objExistant= this.getByName(allergene.getLibelle());
-		if(objExistant!= null){
-			/** On le met à jour */
-			allergene.setId(objExistant.getId());
-			return objExistant.getId();
-		}else{
-			/** Sinon on l'insère dans la base de données */
-			preReqInsert.setString(1, allergene.getLibelle());
-			preReqInsert.executeUpdate();
-			/** Et récupère son Id */
-			ResultSet rs= preReqInsert.getGeneratedKeys();
-			int id= 0;
-			if(rs.next()){
-				id= rs.getInt(1);
+		
+		/** Si l'index dans la base de données n'a pas été initialisé */
+		if(allergene.getId()== 0){
+		
+			/** On vérifie si l'objet n'existe pas déjà dans la base de données */
+			Allergene objExistant= this.getByName(allergene.getLibelle());
+			if(objExistant!= null){
 				/** On le met à jour */
-				allergene.setId(id);
+				allergene.setId(objExistant.getId());
+				return objExistant.getId();
+			}else{
+				/** Sinon on l'insère dans la base de données */
+				preReqInsert.setString(1, allergene.getLibelle());
+				preReqInsert.executeUpdate();
+				/** Et récupère son Id */
+				ResultSet rs= preReqInsert.getGeneratedKeys();
+				int id= 0;
+				if(rs.next()){
+					id= rs.getInt(1);
+					/** On le met à jour */
+					allergene.setId(id);
+				}
+				rs.close();
+				
+				return id;
 			}
-			rs.close();
-			
-			return id;
+		}else{
+			return allergene.getId();
 		}
 	}
 

@@ -127,27 +127,34 @@ public class CategorieDaoJdbc implements CategorieDao {
 		if(categorie== null){
 			throw new SQLException("Valeur nulle!");
 		}
-		/** On vérifie si l'objet n'existe pas déjà dans la base de données */
-		Categorie objExistant= this.getByName(categorie.getLibelle());
-		if(objExistant!= null){
-			/** On le met à jour */
-			categorie.setId(objExistant.getId());
-			return objExistant.getId();
-		}else{
-			/** Sinon on l'insère dans la base de données */
-			preReqInsert.setString(1, categorie.getLibelle());
-			preReqInsert.executeUpdate();
-			/** Et récupère son Id */
-			ResultSet rs= preReqInsert.getGeneratedKeys();
-			int id= 0;
-			if(rs.next()){
-				id= rs.getInt(1);
-				/** On le met à jour */
-				categorie.setId(id);
-			}
-			rs.close();
+		
+		/** Si l'index dans la base de données n'a pas été initialisé */
+		if(categorie.getId()== 0){
 			
-			return id;
+			/** On vérifie si l'objet n'existe pas déjà dans la base de données */
+			Categorie objExistant= this.getByName(categorie.getLibelle());
+			if(objExistant!= null){
+				/** On le met à jour */
+				categorie.setId(objExistant.getId());
+				return objExistant.getId();
+			}else{
+				/** Sinon on l'insère dans la base de données */
+				preReqInsert.setString(1, categorie.getLibelle());
+				preReqInsert.executeUpdate();
+				/** Et récupère son Id */
+				ResultSet rs= preReqInsert.getGeneratedKeys();
+				int id= 0;
+				if(rs.next()){
+					id= rs.getInt(1);
+					/** On le met à jour */
+					categorie.setId(id);
+				}
+				rs.close();
+				
+				return id;
+			}
+		}else{
+			return categorie.getId();
 		}
 	}
 
