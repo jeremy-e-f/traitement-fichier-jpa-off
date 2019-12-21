@@ -1,6 +1,5 @@
 package fr.diginamic.entities;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -144,36 +143,14 @@ public class Produit implements Comparable<Produit>{
 	 */
 	public Produit(){
 	}
-	
-	public Produit(String nom, Categorie categorie, Marque marque, char scoreNutritionnel, ArrayList<Ingredient> listeIngredients,
-			ArrayList<Allergene> listeAllergenes, ArrayList<Additif> listeAdditifs, Double energie, Double graisse,
-			Double graisseSaturee, Double hydratesCarbones, Double sucres, Double fibres, Double proteines,
-			Double sel) {
-		this.nom= nom;
-		this.categorie = categorie;
-		this.marque = marque;
-		this.scoreNutritionnel = scoreNutritionnel;
-		this.listeIngredients = listeIngredients;
-		this.listeAllergenes = listeAllergenes;
-		this.listeAdditifs = listeAdditifs;
-		this.energie = energie;
-		this.graisse = graisse;
-		this.graisseSaturee = graisseSaturee;
-		this.hydratesCarbones = hydratesCarbones;
-		this.sucres = sucres;
-		this.fibres = fibres;
-		this.proteines = proteines;
-		this.sel = sel;
-	}
 
-	public Produit(int id, String nom, Categorie categorie, Marque marque, char scoreNutritionnel, List<Ingredient> listeIngredients,
+	public Produit(String nom, Categorie categorie, Marque marque, char scoreNutritionnel, List<Ingredient> listeIngredients,
 			List<Allergene> listeAllergenes, List<Additif> listeAdditifs, Double energie,
 			Double graisse, Double graisseSaturee, Double hydratesCarbones, Double sucres, Double fibres,
 			Double proteines, Double sel, Double vitA, Double vitD, Double vitE, Double vitK, Double vitC,
 			Double vitB1, Double vitB2, Double vitPP, Double vitB6, Double vitB9, Double vitB12, Double calcium,
 			Double magnesium, Double fer, Double betaCarotene, boolean presenceHuilePalme,
 			Double pourcentageFruitsLegumes) {
-		this.id = id;
 		this.nom = nom;
 		this.categorie = categorie;
 		this.marque = marque;
@@ -206,6 +183,19 @@ public class Produit implements Comparable<Produit>{
 		this.betaCarotene = betaCarotene;
 		this.presenceHuilePalme = presenceHuilePalme;
 		this.pourcentageFruitsLegumes = pourcentageFruitsLegumes;
+	}
+	
+	public Produit(int id, String nom, Categorie categorie, Marque marque, char scoreNutritionnel, List<Ingredient> listeIngredients,
+			List<Allergene> listeAllergenes, List<Additif> listeAdditifs, Double energie,
+			Double graisse, Double graisseSaturee, Double hydratesCarbones, Double sucres, Double fibres,
+			Double proteines, Double sel, Double vitA, Double vitD, Double vitE, Double vitK, Double vitC,
+			Double vitB1, Double vitB2, Double vitPP, Double vitB6, Double vitB9, Double vitB12, Double calcium,
+			Double magnesium, Double fer, Double betaCarotene, boolean presenceHuilePalme,
+			Double pourcentageFruitsLegumes) {
+		this(nom, categorie, marque, scoreNutritionnel, listeIngredients, listeAllergenes, 
+			listeAdditifs, energie, graisse, graisseSaturee, hydratesCarbones, sucres, fibres, proteines, sel, vitA ,vitD ,vitE ,vitK ,vitC ,
+			vitB1 ,vitB2 ,vitPP ,vitB6 ,vitB9 ,vitB12 ,calcium ,magnesium, fer ,betaCarotene, presenceHuilePalme, pourcentageFruitsLegumes);
+		this.id = id;
 	}
 
 	/** Getter
@@ -672,7 +662,7 @@ public class Produit implements Comparable<Produit>{
 
 	@Override
 	public String toString() {
-		return "Produit [nom=" + nom + ", categorie=" + categorie + ", marque=" + marque + ", scoreNutritionnel="
+		return "Produit [id=" + id + ",nom=" + nom + ", categorie=" + categorie + ", marque=" + marque + ", scoreNutritionnel="
 				+ scoreNutritionnel + ", listeIngredients=" + listeIngredients + ", listeAllergenes=" + listeAllergenes
 				+ ", listeAdditifs=" + listeAdditifs + ", energie=" + energie + ", graisse=" + graisse
 				+ ", graisseSaturee=" + graisseSaturee + ", hydratesCarbones=" + hydratesCarbones + ", sucres=" + sucres

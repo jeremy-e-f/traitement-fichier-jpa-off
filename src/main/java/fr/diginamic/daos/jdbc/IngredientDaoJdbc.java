@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import fr.diginamic.daos.IngredientDao;
 import fr.diginamic.entities.Ingredient;
+import fr.diginamic.exceptions.FunctionalException;
 import fr.diginamic.jdbc.ConnectionJDBC;
 
 public class IngredientDaoJdbc implements IngredientDao {
@@ -120,9 +121,9 @@ public class IngredientDaoJdbc implements IngredientDao {
 	}
 
 	@Override
-	public int insert(Ingredient ingredient) throws SQLException {
+	public int insert(Ingredient ingredient) throws SQLException, FunctionalException {
 		if(ingredient== null){
-			throw new SQLException("Valeur nulle!");
+			throw new FunctionalException("Valeur nulle!");
 		}
 		
 		/** Si l'index dans la base de données n'a pas été initialisé */
@@ -156,10 +157,10 @@ public class IngredientDaoJdbc implements IngredientDao {
 	}
 
 	@Override
-	public int update(Ingredient ingredient) throws SQLException {
+	public int update(Ingredient ingredient) throws SQLException, FunctionalException {
 		int retour= 0;
 		if(ingredient== null){
-			throw new SQLException("Valeur nulle!");
+			throw new FunctionalException("Valeur nulle!");
 		}
 		int i= 1;
 		preReqUpdate.setString(i++, ingredient.getLibelle());
@@ -169,11 +170,11 @@ public class IngredientDaoJdbc implements IngredientDao {
 	}
 
 	@Override
-	public boolean delete(Ingredient ingredient) throws SQLException {
+	public boolean delete(Ingredient ingredient) throws SQLException, FunctionalException {
 		int retour= 0;
 		
 		if(ingredient== null){
-			throw new SQLException("Valeur nulle!");
+			throw new FunctionalException("Valeur nulle!");
 		}
 		
 		preReqDelete.setInt(1, ingredient.getId());

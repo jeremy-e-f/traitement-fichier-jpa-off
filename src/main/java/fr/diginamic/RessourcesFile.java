@@ -142,7 +142,7 @@ public class RessourcesFile{
 				String libellesAdditif= elements[31].trim();
 				
 				/** On cree le nouveau produit avec ses dépendances */
-				Produit produit= new Produit(id, nomProduit, categorie, marque, scoreNutritionnel, traitementIngredient(libellesIngredient), traitementAllergene(libellesAllergene), 
+				Produit produit= new Produit(nomProduit, categorie, marque, scoreNutritionnel, traitementIngredient(libellesIngredient), traitementAllergene(libellesAllergene), 
 						traitementAdditif(libellesAdditif), energie, graisse, graisseSaturee, hydratesCarbones, sucres, fibres, proteines, sel, vitA ,vitD ,vitE ,vitK ,vitC ,
 						vitB1 ,vitB2 ,vitPP ,vitB6 ,vitB9 ,vitB12 ,calcium ,magnesium, fer ,betaCarotene, presenceHuilePalme, pourcentageFruitsLegumes);
 				

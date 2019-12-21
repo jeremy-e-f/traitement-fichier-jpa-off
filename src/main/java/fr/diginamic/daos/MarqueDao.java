@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import fr.diginamic.entities.Marque;
+import fr.diginamic.exceptions.FunctionalException;
 
 public interface MarqueDao {
 
@@ -33,22 +34,25 @@ public interface MarqueDao {
 	 * @param marque
 	 * @return retourne l'Id de l'objet dans la base de données
 	 * @throws SQLException 
+	 * @throws FunctionalException 
 	 */
-	int insert(Marque marque) throws SQLException;
+	int insert(Marque marque) throws SQLException, FunctionalException;
 	
 	/**
 	 * Met à jour la marque passée en paramètre
 	 * @param marque
 	 * @return
 	 * @throws SQLException 
+	 * @throws FunctionalException 
 	 */
-	int update(Marque marque) throws SQLException;
+	int update(Marque marque) throws SQLException, FunctionalException;
 	
 	/**
 	 * Supprime la marque passée en paramètre
 	 * @param marque
 	 * @return
 	 * @throws SQLException 
+	 * @throws FunctionalException 
 	 */
-	boolean delete(Marque marque) throws SQLException;
+	boolean delete(Marque marque) throws SQLException, FunctionalException;
 }

@@ -31,7 +31,7 @@ import fr.diginamic.entities.Produit;
 import fr.diginamic.entities.Stock;
 import fr.diginamic.jdbc.ConnectionJDBC;
 
-public class IntegrationOpenFoodFacts {
+public class IntegrationOpenFoodFactsJdbc {
 
 	/** Logger */
 	private static final Logger LOG = LoggerFactory.getLogger("");
@@ -41,7 +41,7 @@ public class IntegrationOpenFoodFacts {
 
 	public static void main(String[] args) {
 		/** Nom du fichier .CSV contenant les informations à intégrer */
-		String nomFichier= "D:/Work/Programmation/JAVA/traitement-fichier-jpa-off/src/main/resources/open-food-facts.csv";
+		String nomFichier= AppSettings.FILESOURCENAME;
 		
 		LOG.debug("Opération d'intégration commencée.");
 		long debut= System.currentTimeMillis();
@@ -170,7 +170,7 @@ public class IntegrationOpenFoodFacts {
 			
 			/** Si la séquence s'est déroulée jusqu'au bout, on valide le tout */
 			connection.commit();
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			LOG.error(e.getMessage());
 			/** Sinon, on annule l'intégration */
 			try {

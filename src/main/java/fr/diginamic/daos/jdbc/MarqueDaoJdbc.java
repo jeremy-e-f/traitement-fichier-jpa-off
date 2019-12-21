@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import fr.diginamic.daos.MarqueDao;
 import fr.diginamic.entities.Marque;
+import fr.diginamic.exceptions.FunctionalException;
 import fr.diginamic.jdbc.ConnectionJDBC;
 
 public class MarqueDaoJdbc implements MarqueDao {
@@ -123,9 +124,9 @@ public class MarqueDaoJdbc implements MarqueDao {
 	}
 
 	@Override
-	public int insert(Marque marque) throws SQLException {
+	public int insert(Marque marque) throws SQLException, FunctionalException {
 		if(marque== null){
-			throw new SQLException("Valeur nulle!");
+			throw new FunctionalException("Valeur nulle!");
 		}
 		
 		/** Si l'index dans la base de données n'a pas été initialisé */
@@ -159,10 +160,10 @@ public class MarqueDaoJdbc implements MarqueDao {
 	}
 
 	@Override
-	public int update(Marque marque) throws SQLException {
+	public int update(Marque marque) throws SQLException, FunctionalException {
 		int retour= 0;
 		if(marque== null){
-			throw new SQLException("Valeur nulle!");
+			throw new FunctionalException("Valeur nulle!");
 		}
 		int i= 1;
 		preReqUpdate.setString(i++, marque.getNom());
@@ -172,11 +173,11 @@ public class MarqueDaoJdbc implements MarqueDao {
 	}
 
 	@Override
-	public boolean delete(Marque marque) throws SQLException {
+	public boolean delete(Marque marque) throws SQLException, FunctionalException {
 		int retour= 0;
 		
 		if(marque== null){
-			throw new SQLException("Valeur nulle!");
+			throw new FunctionalException("Valeur nulle!");
 		}
 		
 		preReqDelete.setInt(1, marque.getId());

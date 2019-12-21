@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import fr.diginamic.daos.AdditifDao;
 import fr.diginamic.entities.Additif;
+import fr.diginamic.exceptions.FunctionalException;
 import fr.diginamic.jdbc.ConnectionJDBC;
 
 public class AdditifDaoJdbc implements AdditifDao {
@@ -118,9 +119,9 @@ public class AdditifDaoJdbc implements AdditifDao {
 	}
 
 	@Override
-	public int insert(Additif additif) throws SQLException {
+	public int insert(Additif additif) throws SQLException, FunctionalException {
 		if(additif== null){
-			throw new SQLException("Valeur nulle!");
+			throw new FunctionalException("Valeur nulle!");
 		}
 		
 		/** Si l'index dans la base de données n'a pas été initialisé */
@@ -153,10 +154,10 @@ public class AdditifDaoJdbc implements AdditifDao {
 	}
 
 	@Override
-	public int update(Additif additif) throws SQLException {
+	public int update(Additif additif) throws SQLException, FunctionalException {
 		int retour= 0;
 		if(additif== null){
-			throw new SQLException("Valeur nulle!");
+			throw new FunctionalException("Valeur nulle!");
 		}
 		int i= 1;
 		preReqUpdate.setString(i++, additif.getLibelle());
@@ -166,11 +167,11 @@ public class AdditifDaoJdbc implements AdditifDao {
 	}
 
 	@Override
-	public boolean delete(Additif additif) throws SQLException {
+	public boolean delete(Additif additif) throws SQLException, FunctionalException {
 		int retour= 0;
 		
 		if(additif== null){
-			throw new SQLException("Valeur nulle!");
+			throw new FunctionalException("Valeur nulle!");
 		}
 		
 		preReqDelete.setInt(1, additif.getId());

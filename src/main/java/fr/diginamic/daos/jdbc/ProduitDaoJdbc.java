@@ -21,6 +21,7 @@ import fr.diginamic.entities.Categorie;
 import fr.diginamic.entities.Ingredient;
 import fr.diginamic.entities.Marque;
 import fr.diginamic.entities.Produit;
+import fr.diginamic.exceptions.FunctionalException;
 import fr.diginamic.jdbc.ConnectionJDBC;
 
 public class ProduitDaoJdbc implements ProduitDao {
@@ -245,9 +246,9 @@ public class ProduitDaoJdbc implements ProduitDao {
 	}
 
 	@Override
-	public void insert(Produit produit) throws SQLException {
+	public void insert(Produit produit) throws SQLException, FunctionalException {
 		if(produit== null){
-			throw new SQLException("Valeur nulle!");
+			throw new FunctionalException("Valeur nulle!");
 		}
 		
 		int id= this.getId(produit.getNom(), produit.getMarque().getNom());
@@ -360,10 +361,10 @@ public class ProduitDaoJdbc implements ProduitDao {
 	}
 
 	@Override
-	public int update(Produit produit) throws SQLException {
+	public int update(Produit produit) throws SQLException, FunctionalException {
 		int retour= 0;
 		if(produit== null){
-			throw new SQLException("Valeur nulle!");
+			throw new FunctionalException("Valeur nulle!");
 		}
 
 		int i= 1;
@@ -403,11 +404,11 @@ public class ProduitDaoJdbc implements ProduitDao {
 	}
 
 	@Override
-	public boolean delete(Produit produit) throws SQLException {
+	public boolean delete(Produit produit) throws FunctionalException, SQLException {
 		int retour= 0;
 		
 		if(produit== null){
-			throw new SQLException("Valeur nulle!");
+			throw new FunctionalException("Valeur nulle!");
 		}
 		
 		preReqDelete.setInt(1, produit.getId());

@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import fr.diginamic.entities.Allergene;
+import fr.diginamic.exceptions.FunctionalException;
 
 public interface AllergeneDao {
 
@@ -33,22 +34,25 @@ public interface AllergeneDao {
 	 * @param allergene
 	 * @return retourne l'Id de l'objet dans la base de données
 	 * @throws SQLException 
+	 * @throws FunctionalException 
 	 */
-	int insert(Allergene allergene) throws SQLException;
+	int insert(Allergene allergene) throws SQLException, FunctionalException;
 	
 	/**
 	 * Met à jour l'allergène passé en paramètre
 	 * @param allergene
 	 * @return
 	 * @throws SQLException 
+	 * @throws FunctionalException 
 	 */
-	int update(Allergene allergene) throws SQLException;
+	int update(Allergene allergene) throws SQLException, FunctionalException;
 	
 	/**
 	 * Supprime l'allergene passé en paramètre
 	 * @param allergene
 	 * @return
 	 * @throws SQLException 
+	 * @throws FunctionalException 
 	 */
-	boolean delete(Allergene allergene) throws SQLException;
+	boolean delete(Allergene allergene) throws SQLException, FunctionalException;
 }

@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import fr.diginamic.daos.CategorieDao;
 import fr.diginamic.entities.Categorie;
+import fr.diginamic.exceptions.FunctionalException;
 import fr.diginamic.jdbc.ConnectionJDBC;
 
 public class CategorieDaoJdbc implements CategorieDao {
@@ -123,9 +124,9 @@ public class CategorieDaoJdbc implements CategorieDao {
 	}
 
 	@Override
-	public int insert(Categorie categorie) throws SQLException {
+	public int insert(Categorie categorie) throws SQLException, FunctionalException {
 		if(categorie== null){
-			throw new SQLException("Valeur nulle!");
+			throw new FunctionalException("Valeur nulle!");
 		}
 		
 		/** Si l'index dans la base de données n'a pas été initialisé */
@@ -159,10 +160,10 @@ public class CategorieDaoJdbc implements CategorieDao {
 	}
 
 	@Override
-	public int update(Categorie categorie) throws SQLException {
+	public int update(Categorie categorie) throws SQLException, FunctionalException {
 		int retour= 0;
 		if(categorie== null){
-			throw new SQLException("Valeur nulle!");
+			throw new FunctionalException("Valeur nulle!");
 		}
 		int i= 1;
 		preReqUpdate.setString(i++, categorie.getLibelle());
@@ -172,11 +173,11 @@ public class CategorieDaoJdbc implements CategorieDao {
 	}
 
 	@Override
-	public boolean delete(Categorie categorie) throws SQLException {
+	public boolean delete(Categorie categorie) throws SQLException, FunctionalException {
 		int retour= 0;
 		
 		if(categorie== null){
-			throw new SQLException("Valeur nulle!");
+			throw new FunctionalException("Valeur nulle!");
 		}
 		
 		preReqDelete.setInt(1, categorie.getId());

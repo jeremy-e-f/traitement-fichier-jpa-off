@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import fr.diginamic.entities.Categorie;
+import fr.diginamic.exceptions.FunctionalException;
 
 public interface CategorieDao {
 
@@ -33,22 +34,25 @@ public interface CategorieDao {
 	 * @param categorie
 	 * @return retourne l'Id de l'objet dans la base de données
 	 * @throws SQLException 
+	 * @throws FunctionalException 
 	 */
-	int insert(Categorie categorie) throws SQLException;
+	int insert(Categorie categorie) throws SQLException, FunctionalException;
 	
 	/**
 	 * Met à jour la catégorie passée en paramètre
 	 * @param categorie
 	 * @return
 	 * @throws SQLException 
+	 * @throws FunctionalException 
 	 */
-	int update(Categorie categorie) throws SQLException;
+	int update(Categorie categorie) throws SQLException, FunctionalException;
 	
 	/**
 	 * Supprime la categorie passée en paramètre
 	 * @param categorie
 	 * @return
 	 * @throws SQLException 
+	 * @throws FunctionalException 
 	 */
-	boolean delete(Categorie categorie) throws SQLException;
+	boolean delete(Categorie categorie) throws SQLException, FunctionalException;
 }

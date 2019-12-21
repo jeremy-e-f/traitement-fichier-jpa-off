@@ -2,8 +2,10 @@ package fr.diginamic.entities;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -27,7 +29,7 @@ public class Categorie {
 	@Column(name="LIBELLE", nullable= false, unique = true)
 	private String libelle;				/** Libellé de la catégorie */
 	
-	@OneToMany(mappedBy="categorie")
+	@OneToMany(mappedBy="categorie", cascade=CascadeType.PERSIST, fetch = FetchType.LAZY)
 	private List<Produit> listeProduits; /** Liste des produits appartenant à la catégorie */
 	
 	/**

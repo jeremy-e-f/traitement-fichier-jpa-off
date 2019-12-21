@@ -3,6 +3,7 @@ package fr.diginamic.daos;
 import java.sql.SQLException;
 
 import fr.diginamic.entities.Produit;
+import fr.diginamic.exceptions.FunctionalException;
 
 public interface ProduitDao {
 	
@@ -25,23 +26,26 @@ public interface ProduitDao {
 	 * Insère un nouvel produit
 	 * @param produit
 	 * @throws SQLException 
+	 * @throws FunctionalException 
 	 */
-	void insert(Produit produit) throws SQLException;
+	void insert(Produit produit) throws SQLException, FunctionalException;
 	
 	/**
 	 * Met à jour le produit passé en paramètre
 	 * @param produit
 	 * @return
 	 * @throws SQLException 
+	 * @throws FunctionalException 
 	 */
-	int update(Produit produit) throws SQLException;
+	int update(Produit produit) throws SQLException, FunctionalException;
 	
 	/**
 	 * Supprime le produit passé en paramètre
 	 * @param produit
 	 * @return
 	 * @throws SQLException 
+	 * @throws FunctionalException 
 	 */
-	boolean delete(Produit produit) throws SQLException;
+	boolean delete(Produit produit) throws SQLException, FunctionalException;
 	
 }

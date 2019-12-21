@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import fr.diginamic.entities.Additif;
+import fr.diginamic.exceptions.FunctionalException;
 
 public interface AdditifDao {
 
@@ -33,24 +34,27 @@ public interface AdditifDao {
 	 * @param additif
 	 * @return retourne l'Id de l'objet dans la base de données
 	 * @throws SQLException 
+	 * @throws FunctionalException 
 	 */
-	int insert(Additif additif) throws SQLException;
+	int insert(Additif additif) throws SQLException, FunctionalException;
 	
 	/**
 	 * Met à jour l'additif passé en paramètre
 	 * @param additif
 	 * @return
 	 * @throws SQLException 
+	 * @throws FunctionalException 
 	 */
-	int update(Additif additif) throws SQLException;
+	int update(Additif additif) throws SQLException, FunctionalException;
 	
 	/**
 	 * Supprime l'additif passé en paramètre
 	 * @param additif
 	 * @return
 	 * @throws SQLException 
+	 * @throws FunctionalException 
 	 */
-	boolean delete(Additif additif) throws SQLException;
+	boolean delete(Additif additif) throws SQLException, FunctionalException;
 	
 }
 

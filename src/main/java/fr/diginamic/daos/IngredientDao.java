@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import fr.diginamic.entities.Ingredient;
+import fr.diginamic.exceptions.FunctionalException;
 
 public interface IngredientDao {
 
@@ -33,22 +34,25 @@ public interface IngredientDao {
 	 * @param ingredient
 	 * @return retourne l'Id de l'objet dans la base de données
 	 * @throws SQLException 
+	 * @throws FunctionalException 
 	 */
-	int insert(Ingredient ingredient) throws SQLException;
+	int insert(Ingredient ingredient) throws SQLException, FunctionalException;
 	
 	/**
 	 * Met à jour l'ingrédient passé en paramètre
 	 * @param ingredient
 	 * @return
 	 * @throws SQLException 
+	 * @throws FunctionalException 
 	 */
-	int update(Ingredient ingredient) throws SQLException;
+	int update(Ingredient ingredient) throws SQLException, FunctionalException;
 	
 	/**
 	 * Supprime l'ingredient passé en paramètre
 	 * @param ingredient
 	 * @return
 	 * @throws SQLException 
+	 * @throws FunctionalException 
 	 */
-	boolean delete(Ingredient ingredient) throws SQLException;
+	boolean delete(Ingredient ingredient) throws SQLException, FunctionalException;
 }

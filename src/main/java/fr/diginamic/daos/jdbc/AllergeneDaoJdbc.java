@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import fr.diginamic.daos.AllergeneDao;
 import fr.diginamic.entities.Allergene;
+import fr.diginamic.exceptions.FunctionalException;
 import fr.diginamic.jdbc.ConnectionJDBC;
 
 public class AllergeneDaoJdbc implements AllergeneDao {
@@ -120,9 +121,9 @@ public class AllergeneDaoJdbc implements AllergeneDao {
 	}
 
 	@Override
-	public int insert(Allergene allergene) throws SQLException {
+	public int insert(Allergene allergene) throws SQLException, FunctionalException {
 		if(allergene== null){
-			throw new SQLException("Valeur nulle!");
+			throw new FunctionalException("Valeur nulle!");
 		}
 		
 		/** Si l'index dans la base de données n'a pas été initialisé */
@@ -156,10 +157,10 @@ public class AllergeneDaoJdbc implements AllergeneDao {
 	}
 
 	@Override
-	public int update(Allergene allergene) throws SQLException {
+	public int update(Allergene allergene) throws SQLException, FunctionalException {
 		int retour= 0;
 		if(allergene== null){
-			throw new SQLException("Valeur nulle!");
+			throw new FunctionalException("Valeur nulle!");
 		}
 		int i= 1;
 		preReqUpdate.setString(i++, allergene.getLibelle());
@@ -169,11 +170,11 @@ public class AllergeneDaoJdbc implements AllergeneDao {
 	}
 
 	@Override
-	public boolean delete(Allergene allergene) throws SQLException {
+	public boolean delete(Allergene allergene) throws SQLException, FunctionalException {
 		int retour= 0;
 		
 		if(allergene== null){
-			throw new SQLException("Valeur nulle!");
+			throw new FunctionalException("Valeur nulle!");
 		}
 		
 		preReqDelete.setInt(1, allergene.getId());
